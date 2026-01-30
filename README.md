@@ -24,6 +24,33 @@ For this project, we create a new application using `ng new first-app`.
   
 And here we are!  
 
+First of all, let's run the application using `ng serve` to make sure it works, and then we'll move on to the next step.
 
+ ## Hello World!  
 
+  
+We have created a new application, let's modify it so it displays "Hello World!" instead of "Hello, first-app".  
 
+src/app.html
+```html
+    <title>Homes</title>
+```
+
+src/app.ts
+```ts
+import { RouterOutlet } from '@angular/router';
+
+@Component({
+  selector: 'app-root',
+  imports: [RouterOutlet],
+  // templateUrl: './lol.html',
+  template: `
+    <h1>Hello, {{title()}}</h1>`,
+  styleUrl: './app.css'
+})
+export class App {
+  // title = 'LoL Face!!! hahahaa'
+  protected readonly title = signal('World!');
+}
+
+```

@@ -260,3 +260,67 @@ section.listing a::after {
   margin-left: 5px;
 }
 ```
+
+## Creating an Angular Interface. 
+  
+If you want to read the CLI help menu specifically for generating an interface, the following command is useful:
+
+```
+ng --help generate interface
+```   
+
+We'll use `ng generate` to generate a new interface. We want to generate an interface for `HousingLocation` which will create a new `housing-location.ts` file. We want this to be in our application's root directory. In our case, that is `first-app/`.    
+
+```sh
+ng generate interface housingLocation
+```
+
+This will create a new file in `src/app/housing-location.ts` with the following contents:
+
+```ts
+export interface HousingLocation {
+}
+```
+
+If we import this as is to use in our `Home` component, we will have a naming collision, because `HousingLocation` is also the name of a component.  
+  
+To avoid this collision, we could add an alias, or just rename the interface. And that's what we'll do:
+
+```ts
+// src/app/housing-location.ts
+export interface HousingLocationInfo {
+  id: number;
+  name: string;
+  city: string;
+  state: string;
+  photo: string;
+  availableUnits: number;
+  wifi: boolean;
+  laundry: boolean;
+}
+```
+
+And then we can use it in our `Home` component:
+
+```ts
+// src/app/home/home.ts
+import { HousingLocationInfo } from '../housing-location';
+
+// ...
+
+export class Home {
+
+  housingLocation: HousingLocationInfo = {
+    id: 9999,
+    name: 'Test Home',
+    city: 'Test city',
+    state: 'ST',
+    photo: `${this.baseUrl}/example-house.jpg`,
+    availableUnits: 99,
+    wifi: true,
+    laundry: false,
+  };
+}
+```
+
+We are also adding a `baseUrl` property to the home component, so we can use it to construct the URL for the image.

@@ -323,4 +323,47 @@ export class Home {
 }
 ```
 
-We are also adding a `baseUrl` property to the home component, so we can use it to construct the URL for the image.
+We are also adding a `baseUrl` property to the home component, so we can use it to construct the URL for the image. The `baseUrl` is `/` and then whichever directory the image is in. By default, we have assets in our `/public` directory, so `baseUrl` can be `/images` and will expect an `images/` directory in `public/`.  
+  
+Update `home.ts` to use the `housing-location` component:
+
+```ts
+// src/app/home/home.ts
+// ...
+  template: `
+    <section>
+      <form>
+        <input type="text" placeholder="Filter by city" />
+        <button class="primary" type="button">Search</button>
+      </form>
+    </section>
+    <section class="results">
+      <app-housing-location [housingLocation]="housingLocation" />
+    </section> 
+  `,
+// ...
+```
+Note: We are using `[housingLocation]="housingLocation"`. This is syntax shows that we expect the value to come from a property on the component. This is known as "property binding."  
+  
+Finally, let's update the `HousingLocation` component (particularly the `template:` section) to look like a listing component:
+
+```ts
+// src/app/housing-location/housing-location.ts
+// ...
+  template: `
+    <section class="listing">
+      <img 
+        class="listing-photo"
+        [src]="housingLocation().photo"
+        alt="Exterior photo of {{ housingLocation().name }}"
+        crossorigin
+      />
+      <h2 class="listing-heading">{{ housingLocation().name }}</h2>
+      <p class="listing-location">{{ housingLocation().city }}, {{ housingLocation().state }}</p>
+    </section>
+  `,
+// ...
+
+```
+
+

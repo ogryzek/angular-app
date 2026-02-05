@@ -366,4 +366,179 @@ Finally, let's update the `HousingLocation` component (particularly the `templat
 
 ```
 
+Let's add some styles to our `housing-location.css` file:
 
+```css
+/* src/app/housing-location/housing-location.css */
+.listing {
+  background: var(--accent-color);
+  border-radius: 30px;
+  padding-bottom: 30px;
+}
+.listing-heading {
+  color: var(--primary-color);
+  padding: 10px 20px 0 20px;
+}
+.listing-photo {
+  height: 250px;
+  width: 100%;
+  object-fit: cover;
+  border-radius: 30px 30px 0 0;
+}
+.listing-location {
+  padding: 10px 20px 20px 20px;
+}
+.listing-location::before {
+  content: url('/public/location-pin.svg') / '';
+}
+
+section.listing a {
+  padding-left: 20px;
+  text-decoration: none;
+  color: var(--primary-color);
+}
+section.listing a::after {
+  content: '\203A';
+  margin-left: 5px;
+}
+```
+  
+## `@for` Decorator. 
+  
+In Angular, we can use the `@for` decorator to loop over a list of items. This is similar to `*ngFor` in AngularJS, and kind of similar to JavaScript's `for` loop.  
+  
+In the class area of the `Home` component, let's modify the hard-coded single `housingLocation` into a list called `housingLocationList`.  
+  
+```ts
+// src/app/home/home.ts
+// ...
+
+export class Home {
+    // we use the angular.dev url so we can use the images hosted there...
+    readonly baseUrl = 'https://angular.dev/assets/images/tutorials/common';
+
+    housingLocationList: HousingLocationInfo[] = [
+      {
+        id: 0,
+        name: 'Acme Fresh Start Housing',
+        city: 'Chicago',
+        state: 'IL',
+        photo: `${this.baseUrl}/bernard-hermant-CLKGGwIBTaY-unsplash.jpg`,
+        availableUnits: 4,
+        wifi: true,
+        laundry: true,
+      },
+      {
+        id: 1,
+        name: 'A113 Transitional Housing',
+        city: 'Santa Monica',
+        state: 'CA',
+        photo: `${this.baseUrl}/brandon-griggs-wR11KBaB86U-unsplash.jpg`,
+        availableUnits: 0,
+        wifi: false,
+        laundry: true,
+      },
+      {
+        id: 2,
+        name: 'Warm Beds Housing Support',
+        city: 'Juneau',
+        state: 'AK',
+        photo: `${this.baseUrl}/i-do-nothing-but-love-lAyXdl1-Wmc-unsplash.jpg`,
+        availableUnits: 1,
+        wifi: false,
+        laundry: false,
+      },
+      {
+        id: 3,
+        name: 'Homesteady Housing',
+        city: 'Chicago',
+        state: 'IL',
+        photo: `${this.baseUrl}/ian-macdonald-W8z6aiwfi1E-unsplash.jpg`,
+        availableUnits: 1,
+        wifi: true,
+        laundry: false,
+      },
+      {
+        id: 4,
+        name: 'Happy Homes Group',
+        city: 'Gary',
+        state: 'IN',
+        photo: `${this.baseUrl}/krzysztof-hepner-978RAXoXnH4-unsplash.jpg`,
+        availableUnits: 1,
+        wifi: true,
+        laundry: false,
+      },
+      {
+        id: 5,
+        name: 'Hopeful Apartment Group',
+        city: 'Oakland',
+        state: 'CA',
+        photo: `${this.baseUrl}/r-architecture-JvQ0Q5IkeMM-unsplash.jpg`,
+        availableUnits: 2,
+        wifi: true,
+        laundry: true,
+      },
+      {
+        id: 6,
+        name: 'Seriously Safe Towns',
+        city: 'Oakland',
+        state: 'CA',
+        photo: `${this.baseUrl}/phil-hearing-IYfp2Ixe9nM-unsplash.jpg`,
+        availableUnits: 5,
+        wifi: true,
+        laundry: true,
+      },
+      {
+        id: 7,
+        name: 'Hopeful Housing Solutions',
+        city: 'Oakland',
+        state: 'CA',
+        photo: `${this.baseUrl}/r-architecture-GGupkreKwxA-unsplash.jpg`,
+        availableUnits: 2,
+        wifi: true,
+        laundry: true,
+      },
+      {
+        id: 8,
+        name: 'Seriously Safe Towns',
+        city: 'Oakland',
+        state: 'CA',
+        photo: `${this.baseUrl}/saru-robert-9rP3mxf8qWI-unsplash.jpg`,
+        availableUnits: 10,
+        wifi: false,
+        laundry: false,
+      },
+      {
+        id: 9,
+        name: 'Capital Safe Towns',
+        city: 'Portland',
+        state: 'OR',
+        photo: `${this.baseUrl}/webaliser-_TPTXZd9mOo-unsplash.jpg`,
+        availableUnits: 6,
+        wifi: true,
+        laundry: true,
+      },
+  ];
+}
+``` 
+
+Now that we have our list of `housingLocationList`, let's use the `@for` decorator in the template area of the same `Home` component.  
+  
+```ts
+// src/app/home/home.ts
+// ...
+  template: `
+    <section>
+      <form>
+        <input type="text" placeholder="Filter by city" />
+        <button class="primary" type="button">Search</button>
+      </form>
+    </section>
+    <section class="results">
+      @for (housingLocation in housingLocationList) {
+        <app-housing-location [housingLocation]="housingLocation" />
+      }
+    </section> 
+  `,
+// ...
+```

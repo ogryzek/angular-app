@@ -8,8 +8,7 @@ import { Home } from './home/home';
   template: `
   <main>
     <header class="brand-name">
-      <img class="brand-logo" src="images/home.png" alt="logo">
-      <h1>My Houses</h1>
+      <img class="brand-logo" src="images/logo.svg" alt="logo">
     </header>
     <section class="content">
       <app-home />

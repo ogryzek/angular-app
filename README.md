@@ -542,3 +542,115 @@ Now that we have our list of `housingLocationList`, let's use the `@for` decorat
   `,
 // ...
 ```
+
+## Services
+
+Let's create a service. We will use the CLI to generate a service. First, let's try looking at the docks and then a `--dry-run` to see what it will do.  
+   
+Check the docs:  
+```sh
+ng --help generate service
+```
+
+Do a dry run:  
+```sh
+ng generate service housing --dry-run
+```
+
+As you can see, it generates a couple of files. One is the service and other is a "spec" which is another name for a test. Since we are not covering testing in this course, we can generate the service without the test.  
+
+```sh
+ng generate service housing --skip-tests
+```
+
+That generates a `housing.ts` file in `src/app/housing.ts` for us. What we are going to do is take the `housingLocationList` out of our Home component, put it in the service, and then use Angular's Dependency Injection to hydrate the service into the Home component.  
+  
+Next, open up the `housing.ts` service and add the `housingLocationList`. You can just cut/paste from the Home component (note: we don't need it in the Home component anymore, which is why I stated "cut").  
+  
+We also add a couple of methods in the Housing service to interact with the data. One is to get a list of all the housing locations, and the other is to get one based on its id.  
+  
+So, our Housing service should end up looking like this:  
+  
+```js
+// src/app/ housing.ts
+import { Injectable } from '@angular/core';
+import { HousingLocationInfo } from './housing-location';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class Housing {
+  readonly baseUrl = 'https://angular.dev/assets/images/tutorials/common';
+  housingLocationList: HousingLocationInfo[] = [
+    {
+      id: 0,
+      name: 'Acme Fresh Start Housing',  
+      city: 'Chicago',
+      state: 'IL',
+      photo: `${this.baseUrl}/bernard-hermant-CLKGGwIBTaY-unsplash.jpg`,
+      availableUnits: 4,
+      wifi: true,
+      laundry: true,
+    },
+    // ...
+  ];
+
+  getAllHousingLocations(): HousingLocationInfo[] {
+    return this.housingLocationList;
+  }
+
+  getHousingLocationById(id: number): HousingLocationInfo | undefined {
+    return this.housingLocationList.find(
+      (housingLocation) => housingLocation.id === id
+  );}
+}
+```
+
+Next, we want to use the Housing service in our Home component. To do this, we will use Angular's Dependency Injection. Which means we need to add `inject` to the imports.  
+  
+```ts
+import { Component, inject } from '@angular/core';
+```
+
+Then we declate an empty list for housing locations, and right after that we can use the `inject` function on the housing service.  
+  
+When the class constructor is called, we want the dependency injection to happen so we actually call inject inside the contructor. This means our Home component will look like this:  
+
+```ts
+// src/app/home/home.ts
+import { Component, inject } from '@angular/core';
+import { HousingLocationInfo } from '../housing-location';
+import { Housing } from '../housing';
+
+@Component({
+  selector: 'app-home',
+  imports: [HousingLocation],
+  template: `
+    <section>
+      <form>
+        <input type="text" placeholder="Filter by city" />
+        <button class="primary" type="button">Search</button>
+      </form>
+    </section>
+    <section class="results">
+      @for (housingLocation of housingLocationList; track $index) {
+        <app-housing-location [housingLocation]="housingLocation" />
+      }
+    </section> 
+  `,
+  styleUrl: './home.css',
+});
+
+export class Home {
+  housingLocationList: HousingLocationInfo[] = [];
+  housingService: Housing = inject(Housing);
+
+  constructor() {
+    this.housingLocationList = this.housingService.getAllHousingLocations();
+  }
+}
+
+```
+
+Run `ng serve` and make sure it still works.  
+  

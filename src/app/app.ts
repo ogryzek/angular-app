@@ -1,17 +1,18 @@
 import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { Home } from './home/home';
+import { RouterOutlet, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Home],
+  imports: [RouterOutlet, RouterLink],
   template: `
   <main>
-    <header class="brand-name">
-      <img class="brand-logo" src="images/logo.svg" alt="logo">
-    </header>
+    <a [routerLink] = "['/']">
+      <header class="brand-name">
+        <img class="brand-logo" src="images/logo.svg" alt="logo">
+      </header>
+    </a>
     <section class="content">
-      <app-home />
+      <router-outlet />
     </section>
   </main>
   `,

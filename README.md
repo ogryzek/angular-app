@@ -654,3 +654,103 @@ export class Home {
 
 Run `ng serve` and make sure it still works.  
   
+## Routing
+  
+So far, we've created some components and are able to view a list of house-locations on our app. For the next step, we want to be able to click on one and view it as it's own page. Of course, we'll need a component to do so (the `details.ts` component), but there's something interesting to note. Each location has an ID, and we want to be able to use that ID to pull up the specific location's details.  
+  
+To do so, we want to use something like `my-website-address/housing-locations/1` to pull up the details for the location with the ID of 1. The mechanism to create dynamic linking like this is called routing.  
+
+Internally, we use code like `:id` to represent a URL Parameter in the path. And then we can call it by using the `RouterLink` directive. For example, in the `housing-location.ts` component, we can add a link to the details page like this:  
+
+```ts
+// src/app/housing-location/housing-location.ts
+// ...
+  template: `
+    <section class="listing">
+      <img 
+        class="listing-photo"
+        [src]="housingLocation().photo"
+        alt="Exterior photo of {{ housingLocation().name }}"
+        crossorigin
+      />
+      <h2 class="listing-heading">{{ housingLocation().name }}</h2>
+      <p class="listing-location">{{ housingLocation().city }}, {{ housingLocation().state }}</p>
+      <p><a [routerLink] = "['/details', housingLocation().id]">Learn More</a></p> 
+    </section>
+  `,
+// ...
+```
+Where `[routerLink]` is the directive to add a link to a route, and the `['/details', housingLocation().id]` is the path to the route. The `housingLocation().id` is the dynamic part of the path.  
+  
+With the link in place on the `housing-location` component, let's create the `details` component: 
+```sh
+ng generate component details --skip-tests
+```
+  
+We added the mechanism for constructing the link in the housing-location component, and we created the details component, which is the view to use for the specific housing-location. Now we need to tell Angular how to use that link to route to the details page.  
+  
+We took a look at the [documentation](https://angular.dev/tutorials/first-app/10-routing), which said to create a `routes.ts` file, but we decided to use the `app.routes.ts` that already existed.  
+  
+```ts
+// src/app/app.routes.ts
+import { Routes } from '@angular/router';
+import { Home } from './home/home';
+import { Details } from './details/details';
+
+export const routes: Routes = [
+  { path: '', component: Home },
+  { path: 'details/:id', component: Details },
+];
+```
+As you can see, the  `routes` are an array of objects where each object represent a route (a path that maps to a component).  
+  
+As you can see, the details path is `details/:id` where `:id` is the URL parameter, and it maps to the `Details` component, which is the view component for that route.  
+  
+Lastly, because we are adding routes, we need to import the `RouterOutlet` in the `app.ts` file, and update the `bootstrapApplication` in the `main.ts` file.  
+  
+```ts
+// src/app/app.ts
+// ...
+import { RouterOutlet, RouterLink } from '@angular/router';
+// ...
+  imports: [RouterOutlet, RouterLink],
+// ...
+  template: `
+  <main>
+    <a [routerLink] = "['/']">
+      <header class="brand-name">
+        <img class="brand-logo" src="images/logo.svg" alt="logo">
+      </header>
+    </a>
+    <section class="content">
+      <router-outlet />
+    </section>
+  </main>
+  `,
+// ...
+```
+
+And then we update the `main.ts` file to include the `provideRouter` provider:
+
+```ts
+// src/main.ts
+// ...
+import { provideRouter } from '@angular/router';
+import { routes } from './app/app.routes';
+// ...
+
+bootstrapApplication(App, {
+  providers: [
+    ...appConfig.providers,
+    provideRouter(routes),
+  ],
+})
+  .catch((err) => console.error(err));
+```
+
+
+
+
+
+ 
+  

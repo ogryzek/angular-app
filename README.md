@@ -748,6 +748,10 @@ bootstrapApplication(App, {
   .catch((err) => console.error(err));
 ```
 
+## Bonus Exercise!  
+  
+Complete the Details component view such that it displays the details of the housing location. Use the Housing service to get the data.  
+
 
 
 

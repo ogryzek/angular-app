@@ -18,6 +18,5 @@ import { Home } from './home/home';
   styleUrl: './app.css'
 })
 export class App {
-  secretWord = 'Everybody';
   protected readonly lol = signal('Home!');
 }

@@ -752,9 +752,136 @@ bootstrapApplication(App, {
   
 Complete the Details component view such that it displays the details of the housing location. Use the Housing service to get the data.  
 
+## Completing the Details Component View
 
-
-
-
- 
+To complete the `Details.ts` component, we need to get the `id` from the URL parameter. In order to do so, we import `ActivatedRoute` from `@angular/router`, which allows us to set the `route` property on the `Details` class. This gives us access to the `id` property, which we will want to pass to the `Housing` service through its `getHousingLocationById` method.  
   
+```ts
+// src/app/details/details.ts
+/// ...
+export class Details {
+  route: ActivatedRoute = inject(ActivatedRoute);
+  housingService: HousingService = inject(HousingService);
+  housingLocationId: number = -1;
+  housingLocation: HousingLocationInfo | undefined;
+
+  constructor() {
+    this.housingLocationId = Number(this.route.snapshot.params['id']);
+    this.housingLocation = this.housingService.getHousingLocationById(this.housingLocationId)
+  } 
+}
+``` 
+
+Of course, we need to import `ActivatedRoute` and `HousingService` at the top of the file, and we set the template to use the `housingLocation` property.   
+  
+Our Details component file should now look like this:
+
+```ts
+// src/app/details/details.ts
+import { Component, inject } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { Housing as HousingService } from '../housing';
+import { HousingLocationInfo } from '../housing-location';
+
+@Component({
+  selector: 'app-details',
+  imports: [],
+  styleUrls: ['./details.css'],
+  template: `
+    <article>
+      <img
+        class="listing-photo"
+        [src]="housingLocation?.photo"
+        alt="Exterior photo of {{ housingLocation?.name }}"
+        crossorigin
+      />
+      <section class="listing-description">
+        <h2 class="listing-heading">{{ housingLocation?.name }}</h2>    
+      </section>
+    </article>
+  `,
+})
+export class Details {
+  route: ActivatedRoute = inject(ActivatedRoute);
+  housingService: HousingService = inject(HousingService);
+  housingLocationId: number = -1;
+  housingLocation: HousingLocationInfo | undefined;
+
+  constructor() {
+    this.housingLocationId = Number(this.route.snapshot.params['id']);
+    this.housingLocation = this.housingService.getHousingLocationById(this.housingLocationId)
+  }
+}
+```
+
+And of course, we add the styles to `details.css`:
+
+```css
+/* src/app/details/details.css */
+.listing-photo {
+  display: block;
+  height: 600px;
+  width: 50%;
+  object-fit: cover;
+  border-radius: 30px;
+  float: right;
+}
+.listing-heading {
+  font-size: 48pt;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+.listing-location::before {
+  content: url('/public/location-pin.svg') / '';
+}
+.listing-location {
+  font-size: 24pt;
+  margin-bottom: 15px;
+}
+.listing-features > .section-heading {
+  color: var(--secondary-color);
+  font-size: 24pt;
+  margin-bottom: 15px;
+}
+.listing-features {
+  margin-bottom: 20px;
+}
+.listing-features li {
+  font-size: 14pt;
+}
+li {
+  list-style-type: none;
+}
+.listing-apply .section-heading {
+  font-size: 18pt;
+  margin-bottom: 15px;
+}
+label,
+input {
+  display: block;
+}
+label {
+  color: var(--secondary-color);
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 12pt;
+}
+input {
+  font-size: 16pt;
+  margin-bottom: 15px;
+  padding: 10px;
+  width: 400px;
+  border-top: none;
+  border-right: none;
+  border-left: none;
+  border-bottom: solid 0.3px;
+}
+@media (max-width: 1024px) {
+  .listing-photo {
+    width: 100%;
+    height: 400px;
+  }
+}
+```
+
+And that's the Details component complete!

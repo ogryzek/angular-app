@@ -968,3 +968,44 @@ export class Details {
   }
 }
 ```
+
+## Add Search Filter
+
+To add a filter, we'll use the input we have on our Home component, and add a method to filter the results.  
+  
+We can add a template variable to the input, in this case we'll use `#filter`. This is just a variable that allows us to access the value of the input from the button, in the `(click)` event, like this: `(click)="filterResults(filter.value)"`.  
+
+```ts
+// src/app/home/home.ts
+// ...
+  template: `
+    <section>
+      <form>
+        <input type="text" placeholder="Filter by city" #filter />
+        <button class="primary" type="button" (click)="filterResults(filter.value)">Search</button>
+      </form>
+    </section>  
+  `,
+// ...
+```
+
+And then we add the method to the class:
+
+```ts
+// src/app/home/home.ts
+// ...
+export class Home {
+  // ...
+  filterResults(text: string) {
+    if (!text) {
+      this.filteredLocationList = this.housingLocationList;
+    }
+
+    this.filteredLocationList = this.housingLocationList.filter(
+      (housingLocation) => housingLocation.city.toLowerCase().includes(text.toLowerCase())
+    );
+  }
+}
+```
+
+And that's it! We can now search for a city and filter the results.  

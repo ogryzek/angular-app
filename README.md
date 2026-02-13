@@ -884,4 +884,87 @@ input {
 }
 ```
 
-And that's the Details component complete!
+And that's the Details component complete!  
+  
+## Add a Form
+
+We're going to add a form to get familiar forms! We can add a form on the details page to apply to rent a home. For now, we won't do anything with the form input values (data), other than ust log them to the console, but we will implement all of the necessary steps for handling forms.  
+  
+In the Housing service (housing.ts), we can add a method to log details to the console. It will take 3 arguments, and log a string.  
+  
+```ts
+// src/app/housing.ts
+// ...
+submitApplication(firstName: string, lastName: string, email: string) {
+  console.log(`firstName: ${firstName}, lastName: ${lastName}, email: ${email}.`);
+}
+```
+
+Now we can add the form to the template where it will be displayed. And that is the `Details` component.  
+  
+```ts
+// src/app/details/details.ts
+// ...
+
+`
+<section class="listing-apply">
+  <h2 class="section-heading">Apply now to live here</h2>
+  <form [formGroup]="applyForm" (submit)="submitForm()">  
+    <label for="first-name">First Name</label>
+    <input id="first-name" type="text" formControlName="firstName" />
+    <label for="last-name">Last Name</label>
+    <input id="last-name" type="text" formControlName="lastName" />
+    <label for="email">Email</label>
+    <input id="email" type="email" formControlName="email" />
+    <button type="submit" class="primary">Apply now</button>
+  </form>
+</section>
+`
+// ...
+```
+
+Let's pay attention to 3 parts of the form: 
+1. The `formGroup` directive on the `<form>` element. This directive is used to bind the form to the `applyForm` property on the `Details` class.  
+
+What this means is that `[formGroup]="applyForm"` is saying that the `applyForm` property of the `Details` class is now bound to this form.  
+
+2. The `formControlName` directive on the `<input>` elements. This directive is used to bind the input to the `applyForm` property on the `Details` class.  
+
+Basically the equivalent of 1, but for each input.
+
+
+3. The `(submit)` event on the `<form>` element. This is where we specify the method to be called when the form is submitted.  
+  
+We also need to add the `ReactiveFormsModule` to the `imports` array in the `@Component` decorator, and the imports at the top.
+
+```ts
+// src/app/details/details.ts
+// ...
+import { FormGroup, FormControl, ReactiveFormsModule } from '@angular/forms';
+// ...
+  imports: [ReactiveFormsModule],
+// ...
+```
+
+And finally, we want to add a property (`applyForm`)and a method (`submitForm`) to the `Details` class. 
+  
+```ts
+// src/app/details/details.ts
+// ...
+export class Details {
+  // ...
+  applyForm: FormGroup = new FormGroup({
+    firstName: new FormControl(''),
+    lastName: new FormControl(''),
+    email: new FormControl(''),
+  });
+  // ...
+  submitForm() {
+    this.housingService.submitApplication(
+      this.applyForm.value.firstName ?? '',
+      this.applyForm.value.lastName ?? '',
+      this.applyForm.value.email ?? ''
+    )
+  }
+}
+```

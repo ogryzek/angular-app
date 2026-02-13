@@ -2,10 +2,11 @@ import { Component, inject } from '@angular/core';
 import { HousingLocationInfo } from '../housing-location';
 import { Housing as HousingService } from '../housing'; 
 import { ActivatedRoute } from '@angular/router';
+import { FormGroup, FormControl, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-details',
-  imports: [],
+  imports: [ReactiveFormsModule],
   styleUrls: ['./details.css'],
   template: `
     <article>
@@ -27,6 +28,18 @@ import { ActivatedRoute } from '@angular/router';
           <li>Does this location have laundry: {{ housingLocation?.laundry }}</li>
         </ul>
       </section>
+      <section class="listing-apply">
+        <h2 class="section-heading">Apply now to live here</h2>
+        <form [formGroup]="applyForm" (submit)="submitForm()">
+          <label for="first-name">First Name</label>
+          <input id="first-name" type="text" formControlName="firstName" />
+          <label for="last-name">Last Name</label>
+          <input id="last-name" type="text" formControlName="lastName" />
+          <label for="email">Email</label>
+          <input id="email" type="email" formControlName="email" />
+          <button type="submit" class="primary">Apply now</button>
+        </form>
+      </section>
     </article>
   `,
 })
@@ -35,9 +48,22 @@ export class Details {
   housingService: HousingService = inject(HousingService);
   housingLocationId: number = -1;
   housingLocation: HousingLocationInfo | undefined;
+  applyForm: FormGroup = new FormGroup({
+    firstName: new FormControl(''),
+    lastName: new FormControl(''),
+    email: new FormControl(''),
+  });
 
   constructor() {
     this.housingLocationId = Number(this.route.snapshot.params['id']);
     this.housingLocation = this.housingService.getHousingLocationById(this.housingLocationId)
+  }
+
+  submitForm() {
+    this.housingService.submitApplication(
+      this.applyForm.value.firstName ?? '',
+      this.applyForm.value.lastName ?? '',
+      this.applyForm.value.email ?? ''
+    )
   }
 }

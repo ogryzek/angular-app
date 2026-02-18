@@ -1009,3 +1009,182 @@ export class Home {
 ```
 
 And that's it! We can now search for a city and filter the results.  
+  
+## Configure a JSON Server
+
+First off, let's install `json-server`. We will use this to serve a json file that we will use as the database for our application, rather than have a hard-coded `housing-location` array in our `housing` service.  
+  
+```
+npm install -g json-server
+```
+
+Make a file for your data. It doesn't really matter where you put this, as long as you're able to serve it, but let's go ahead and keep it in the root directory of our application, and call it `db.json`:
+
+```json
+{
+  "locations": [
+    {
+      "id": 0,
+      "name": "Acme Fresh Start Housing",
+      "city": "Chicago",
+      "state": "IL",
+      "photo": "https://angular.dev/assets/images/tutorials/common/bernard-hermant-CLKGGwIBTaY-unsplash.jpg",
+      "availableUnits": 4,
+      "wifi": true,
+      "laundry": true
+    },
+    {
+      "id": 1,
+      "name": "A113 Transitional Housing",
+      "city": "Santa Monica",
+      "state": "CA",
+      "photo": "https://angular.dev/assets/images/tutorials/common/brandon-griggs-wR11KBaB86U-unsplash.jpg",
+      "availableUnits": 0,
+      "wifi": false,
+      "laundry": true
+    },
+    {
+      "id": 2,
+      "name": "Warm Beds Housing Support",
+      "city": "Juneau",
+      "state": "AK",
+      "photo": "https://angular.dev/assets/images/tutorials/common/i-do-nothing-but-love-lAyXdl1-Wmc-unsplash.jpg",
+      "availableUnits": 1,
+      "wifi": false,
+      "laundry": false
+    },
+    {
+      "id": 3,
+      "name": "Homesteady Housing",
+      "city": "Chicago",
+      "state": "IL",
+      "photo": "https://angular.dev/assets/images/tutorials/common/ian-macdonald-W8z6aiwfi1E-unsplash.jpg",
+      "availableUnits": 1,
+      "wifi": true,
+      "laundry": false
+    },
+    {
+      "id": 4,
+      "name": "Happy Homes Group",
+      "city": "Gary",
+      "state": "IN",
+      "photo": "https://angular.dev/assets/images/tutorials/common/krzysztof-hepner-978RAXoXnH4-unsplash.jpg",
+      "availableUnits": 1,
+      "wifi": true,
+      "laundry": false
+    },
+    {
+      "id": 5,
+      "name": "Hopeful Apartment Group",
+      "city": "Oakland",
+      "state": "CA",
+      "photo": "https://angular.dev/assets/images/tutorials/common/r-architecture-JvQ0Q5IkeMM-unsplash.jpg",
+      "availableUnits": 2,
+      "wifi": true,
+      "laundry": true
+    },
+    {
+      "id": 6,
+      "name": "Seriously Safe Towns",
+      "city": "Oakland",
+      "state": "CA",
+      "photo": "https://angular.dev/assets/images/tutorials/common/phil-hearing-IYfp2Ixe9nM-unsplash.jpg",
+      "availableUnits": 5,
+      "wifi": true,
+      "laundry": true
+    },
+    {
+      "id": 7,
+      "name": "Hopeful Housing Solutions",
+      "city": "Oakland",
+      "state": "CA",
+      "photo": "https://angular.dev/assets/images/tutorials/common/r-architecture-GGupkreKwxA-unsplash.jpg",
+      "availableUnits": 2,
+      "wifi": true,
+      "laundry": true
+    },
+    {
+      "id": 8,
+      "name": "Seriously Safe Towns",
+      "city": "Oakland",
+      "state": "CA",
+      "photo": "https://angular.dev/assets/images/tutorials/common/saru-robert-9rP3mxf8qWI-unsplash.jpg",
+      "availableUnits": 10,
+      "wifi": false,
+      "laundry": false
+    },
+    {
+      "id": 9,
+      "name": "Capital Safe Towns",
+      "city": "Portland",
+      "state": "OR",
+      "photo": "https://angular.dev/assets/images/tutorials/common/webaliser-_TPTXZd9mOo-unsplash.jpg",
+      "availableUnits": 6,
+      "wifi": true,
+      "laundry": true
+    }
+  ]
+}
+```
+
+To run the server, use the `json-server` command on the file. In this case, we'll pass the `--watch` option as well:
+```
+json-server --watch db.json
+```
+
+Next, we'll update the `Housing` service to fetch data from the json-server rather than use the hard-coded array of housing-listings.  
+
+Set a `url` property on the `Housing` service that we can use to fetch the data:
+```ts
+// src/app/housing.ts
+// ...
+url = 'http://localhost:3000/locations';
+
+// ...
+async getAllHousingLocations(): Promise<HousingLocationInfo[]> {
+  const data = await fetch(this.url);
+  return (await data.json()) ?? [];
+}
+
+```
+
+Finally, we'll update the `getHousingLocationById()` method to also fetch data from the json-server.  
+  
+```ts
+// src/app/housing.ts
+async getHousingLocationById(id: number): Promise<HousingLocationInfo | undefined> {
+  const data = await fetch(`${this.url}?id=${id}`);
+  const locationJSON = await data.json();
+  return locationJSON[0] ?? [];
+}
+
+```
+
+And lastely, we need to update the components! `Home` and `Details` to use the new `getAllHousingLocations()` and `getHousingLocationById()`, respectively.  
+  
+```ts
+// src/app/home/home.ts
+
+// ...
+
+constructor() {
+  this.housingService
+    .getAllHousingLocations()
+    .then((housingLocationList: HousingLocationInfo[]) => {
+      this.housingLocationList = housingLocationList;
+      this.filteredLocationList = housingLocationList;
+      this.changeDetectorRef.markForCheck();
+    });
+}
+```
+
+```ts
+// src/app/details/details.ts
+
+// ...
+  const housingLocationId = parseInt(this.route.snapshot.params['id'], 10);
+  this.housingService.getHousingLocationById(housingLocationId).then((housingLocation) => {
+    this.housingLocation = housingLocation;
+    this.changeDetectorRef.markForCheck();
+  });
+```

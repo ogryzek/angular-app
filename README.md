@@ -1153,9 +1153,9 @@ Finally, we'll update the `getHousingLocationById()` method to also fetch data f
 ```ts
 // src/app/housing.ts
 async getHousingLocationById(id: number): Promise<HousingLocationInfo | undefined> {
-  const data = await fetch(`${this.url}?id=${id}`);
+  const data = await fetch(`${this.url}/${id}`);
   const locationJSON = await data.json();
-  return locationJSON[0] ?? [];
+  return locationJSON ?? [];
 }
 
 ```
